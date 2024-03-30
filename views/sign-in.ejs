@@ -1,31 +1,38 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Meataria - Log In</title>
   </head>
   <body>
-    <div>
-      <h1>Welcom to our Butcher shop</h1>
-      <p>Highest quality, best price</p>
+    <div class="main__page">
+      <div class="bounding__box">
+        <h2>Log In</h2>
+        <form action="POST">
+          <label for="Email">Email</label>
+          <br />
+          <input type="text" name="Email" id="Email" class="textIn"/>
+          <br />
+          <label for="Password">Password</label>
+          <br />
+          <input type="password" name="Password" id="Password" class="textIn"/>
+          <br />
+          <br />
+          <input type="submit" value="Log In" class="submit"/>
+          <br />
+          <br />
+          <a href="">Forgot Your Password?</a>
+        </form>
+      </div>
     </div>
-    <form action="POST">
-    <fieldset>
-      <div>
-        <label for="User Name">User Name : </label>
-        <input id="User Name" type="User Name" name="username"/>
-      </div>
-      <br />
-      <div>
-        <label for="password">Password :</label>
-        <input id="password" type="password" />
-      </div>
-      <br />
-      <div>
-        <button type="button">Sign in</button>
-      </div>
-    </fieldset>
-  </form>
   </body>
 </html>
