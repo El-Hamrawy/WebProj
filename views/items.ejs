@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Items on Sale</title>
+    <link rel="stylesheet" href="/stylesheets/items.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/items">Items on Sale</a>
+        <form action="/items" method="get">
+            <input type="text" name="search" placeholder="Search items..." value="<%= searchQuery || '' %>">
+            <select name="category" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                <% categories.forEach(function(category) { %>
+                    <option value="<%= category %>" <%= selectedCategory === category ? 'selected' : '' %>><%= category %></option>
+                <% }); %>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <% items.forEach(item => { %>
+            <div class="item">
+                <img src="<%= item.photo %>" alt="<%= item.name %>">
+                <div class="item-info">
+                    <h2><%= item.name %></h2>
+                    <p class="price">L.E <%= item.price %></p>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+    <div class="pagination">
+        <% if (hasPrevPage) { %>
+            <a href="/items?page=<%= prevPage %>&search=<%= searchQuery %>&category=<%= selectedCategory %>">Previous</a>
+        <% } %>
+        <span>Page <%= currentPage %> of <%= totalPages %></span>
+        <% if (hasNextPage) { %>
+            <a href="/items?page=<%= nextPage %>&search=<%= searchQuery %>&category=<%= selectedCategory %>">Next</a>
+        <% } %>
+    </div>
+</body>
+</html>
