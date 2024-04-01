@@ -97,3 +97,13 @@ body {
   height: 90%;
   width: 90%;
 }
+.Item {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+.priceBox {
+  position: relative;
+  margin-bottom: 5px;
+  top: 30%;
+}
