@@ -1,7 +1,15 @@
 .cowimage {
-  height: 7cm;
-  width: 10cm;
+  height: 9cm;
+  width: 15cm;
   position: relative;
   margin-top:80px;
   margin:75px;
+}
+.chickenimage{
+  height: 9cm;
+  width: 15cm;
+  position: relative;
+  margin-top:-70px;
+  margin-left: 70px;
+ 
 }
