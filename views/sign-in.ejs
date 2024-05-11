@@ -1,38 +1,80 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/stylesheets/style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-    <title>Meataria - Log In</title>
+    <title>Document</title>
   </head>
   <body>
-    <div class="main__page">
-      <div class="bounding__box">
-        <h2>Log In</h2>
-        <form action="POST">
-          <label for="Email">Email</label>
-          <br />
-          <input type="text" name="Email" id="Email" class="textIn"/>
-          <br />
-          <label for="Password">Password</label>
-          <br />
-          <input type="password" name="Password" id="Password" class="textIn"/>
-          <br />
-          <br />
-          <input type="submit" value="Log In" class="submit"/>
-          <br />
-          <br />
-          <a href="">Forgot Your Password?</a>
+    <div class="container" id="container">
+      <div class="form-container sign-up-container">
+        <form action="#">
+          <h1>Create Account</h1>
+
+          <span>or use your email for registration</span>
+          <input type="text" placeholder="Frist Name" />
+          <input type="text" placeholder="Last Name" />
+          <input type="number" placeholder="Phone Number" />
+          <input type="email" placeholder="Email" />
+          <input type="password" placeholder="Password" />
+          <input type="password" placeholder="Confirm Password" />
+          <button>Sign Up</button>
         </form>
       </div>
+      <div class="form-container sign-in-container">
+        <form action="#">
+          <h1>Sign in</h1>
+
+          <span>or use your account</span>
+          <input type="email" placeholder="Email" />
+          <input type="password" placeholder="Password" />
+          <a href="#">Forgot your password?</a>
+          <button>Sign In</button>
+        </form>
+      </div>
+      <div class="overlay-container">
+        <div class="overlay">
+          <div class="overlay-panel overlay-left">
+            <h1>Welcome Back!</h1>
+            <p>
+              To keep connected with us please login with your personal info
+            </p>
+            <button class="ghost" id="signIn">Sign In</button>
+          </div>
+          <div class="overlay-panel overlay-right">
+            <h1>  Welcome to Meataria</h1>
+            <p>Where we are eager to serve you the freshest of meats</p>
+            <button class="ghost" id="signUp">Sign Up</button>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <footer>
+      <p>
+        Created with <i class="fa fa-heart"></i> by
+        <a target="_blank" href="https://florin-pop.com">Florin Pop</a>
+        - Read how I created this and how you can join the challenge
+        <a
+          target="_blank"
+          href="https://www.florin-pop.com/blog/2019/03/double-slider-sign-in-up-form/"
+          >here</a
+        >.
+      </p>
+      <script>
+        const signUpButton = document.getElementById("signUp");
+        const signInButton = document.getElementById("signIn");
+        const container = document.getElementById("container");
+
+        signUpButton.addEventListener("click", () => {
+          container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener("click", () => {
+          container.classList.remove("right-panel-active");
+        });
+      </script>
+    </footer>
   </body>
 </html>
