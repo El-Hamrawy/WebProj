@@ -49,6 +49,12 @@ body {
   border-radius: 10%;
 }
 
+.cowimage {
+  height: 100px;
+  width: 100px;
+  position: relative;
+  margin: right;
+}
 .textIn {
   size: 75%;
 }
@@ -217,7 +223,7 @@ input {
 .overlay {
   background: #474344;
   background: -webkit-linear-gradient(to right, #474747, #363636);
-  background: linear-gradient(to right,  #9f9e9e, #363636);
+  background: linear-gradient(to right, #9f9e9e, #363636);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
