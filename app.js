@@ -74,33 +74,38 @@ app.get("/sign-up", (req, res) => {
 });
 
 // Signup Route
+
 app.post("/sign-up", (req, res) => {
-    const { firstName, secondName, email, phoneNumber, password } = req.body;
-    const sql = "INSERT INTO users (firstName, secondName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)";
-    db.query(sql, [firstName, secondName, email, phoneNumber, password], (err, result) => {
-        if (err) {
-            res.status(500).send('Error registering new user');
-            return;
-        }
-        res.redirect('/sign-in'); // Redirect to sign-in page after successful registration
-    });
+  console.log("Received signup data:", req.body);
+  res.send("Signup data received, check console for details.");
+    // const { firstName, secondName, email, phoneNumber, password } = req.body;
+    // const sql = "INSERT INTO users (firstName, secondName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)";
+    // db.query(sql, [firstName, secondName, email, phoneNumber, password], (err, result) => {
+    //     if (err) {
+    //         res.status(500).send('Error registering new user');
+    //         return;
+    //     }
+    //     res.redirect('/sign-in'); // Redirect to sign-in page after successful registration
+    // });
 });
 
 // Sign-in Route
 app.post("/sign-in", (req, res) => {
-    const { email, password } = req.body;
-    const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-    db.query(sql, [email, password], (err, results) => {
-        if (err) {
-            res.status(500).send('Error logging in');
-            return;
-        }
-        if (results.length > 0) {
-            res.redirect('/items'); // Redirect to items page on successful login
-        } else {
-            res.send('Email or password is incorrect');
-        }
-    });
+  console.log("Received signup data:", req.body);
+  res.send("Signup data received, check console for details.");
+    // const { email, password } = req.body;
+    // const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+    // db.query(sql, [email, password], (err, results) => {
+    //     if (err) {
+    //         res.status(500).send('Error logging in');
+    //         return;
+    //     }
+    //     if (results.length > 0) {
+    //         res.redirect('/items'); // Redirect to items page on successful login
+    //     } else {
+    //         res.send('Email or password is incorrect');
+    //     }
+    // });
 });
 
 app.get('/items', (req, res) => {
