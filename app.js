@@ -56,6 +56,9 @@ app.get("/sign-in", (req, res) => {
 app.get("/sign-up", (req, res) => {
   res.render("sign-up");
 });
+app.get("/payment", (req, res) => {
+  res.render("payment");
+});
 app.get('/items', (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const searchQuery = req.query.search || '';
