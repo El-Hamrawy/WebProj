@@ -1,0 +1,26 @@
+:root {
+    --background: #eff1f3;
+    --forground: #0f0f0f;
+    --accent1: #f15d5d;
+    --accent2: #5095f0;
+    --accent3: #dbd3d8;
+  }
+body { font-family: Arial, sans-serif; margin: 0; }
+.navbar { background-color: #007bff; overflow: hidden; padding: 0 20px; }
+.navbar a, .navbar form { float: left; color: white; text-align: center; padding: 14px 20px; text-decoration: none; }
+.navbar form { float: right; }
+.navbar input[type="text"], .navbar select { padding: 6px; margin-top: 8px; font-size: 17px; border: none; }
+.navbar button { padding: 6px 10px; margin-top: 8px; margin-left: 22px; background: #ddd; font-size: 17px; border: none; cursor: pointer; }
+.navbar button:hover { background: #ccc; }
+.container { padding: 20px; display: flex; flex-wrap: wrap; justify-content: space-around; }
+.item { margin: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); transition: 0.3s; width: 30%; }
+.item:hover { box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2); }
+.item img { width: 250px; height: 250px }
+.item-info { padding: 15px; }
+.price { color: green; font-weight: bold; }
+.pagination { text-align: center; margin-top: 20px; }
+.pagination a { margin: 0 5px; padding: 5px 10px; background-color: #007bff; color: white; text-decoration: none; }
+.pagination a:hover { background-color: #0056b3; }
+.pagination span { margin: 0 5px; }
+@media (max-width: 800px) { .item { width: 45%; } }
+@media (max-width: 600px) { .item { width: 100%; } }
