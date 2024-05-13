@@ -9,28 +9,26 @@
   <body>
     <div class="container" id="container">
       <div class="form-container sign-up-container">
-        <form action="#">
+        <form action="/sign-up" method="POST">
           <h1>Create Account</h1>
-
           <span>or use your email for registration</span>
-          <input type="text" placeholder="Frist Name" />
-          <input type="text" placeholder="Last Name" />
-          <input type="number" placeholder="Phone Number" />
-          <input type="email" placeholder="Email" />
-          <input type="password" placeholder="Password" />
+          <input type="text" name="firstName" placeholder="First Name" />
+          <input type="text" name="secondName" placeholder="Last Name" />
+          <input type="number" name="phoneNumber" placeholder="Phone Number" />
+          <input type="email" name="email" placeholder="Email" />
+          <input type="password" name="password" placeholder="Password" />
           <input type="password" placeholder="Confirm Password" />
-          <button>Sign Up</button>
+          <button type="submit">Sign Up</button>
         </form>
       </div>
       <div class="form-container sign-in-container">
-        <form action="#">
+        <form action="/sign-in" method="POST">
           <h1>Sign in</h1>
-
           <span>or use your account</span>
-          <input type="email" placeholder="Email" />
-          <input type="password" placeholder="Password" />
+          <input type="email" name="email" placeholder="Email" />
+          <input type="password" name="password" placeholder="Password" />
           <a href="#">Forgot your password?</a>
-          <button>Sign In</button>
+          <button type="submit">Sign In</button>
         </form>
       </div>
       <div class="overlay-container">
