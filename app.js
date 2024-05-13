@@ -3,7 +3,7 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-var mysql = require('mysql');
+var mysql = require('mysql2');
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -12,10 +12,10 @@ var app = express();
 
 // MySQL Connection Setup
 var db = mysql.createConnection({
-    host: 'placeholder-host', // Replace with your MySQL host
-    user: 'placeholder-user', // Replace with your MySQL username
-    password: 'placeholder-password', // Replace with your MySQL password
-    database: 'placeholder-database' // Replace with your MySQL database
+    host: '192.168.50.92', // Replace with your MySQL host
+    user: 'warraky', // Replace with your MySQL username
+    password: 'root', // Replace with your MySQL password
+    database: 'butcher' // Replace with your MySQL database
 });
 
 // Connect to MySQL
@@ -30,6 +30,17 @@ db.connect((err) => {
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.get('/database_test', (req, res)=>{
+  db.query("SELECT 1 + 1 AS solution", (error, results, fields) => {
+    if (error) {
+      console.error("Error executing query:", error);
+      return;
+    }
+    console.log("The solution is:", results[0].solution);
+  });
+
+})
 
 const itemsOnSale = [
   { name: 'Full boned thigh', price: 370, photo: '/images/1.jpg', category: 'beef backside' },
