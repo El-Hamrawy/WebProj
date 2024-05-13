@@ -4,11 +4,32 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mysql = require('mysql2');
+var crypto = require('crypto');
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
 var app = express();
+
+// Crypto setup for cookie encryption
+const algorithm = 'aes-256-ctr';
+const secretKey = crypto.randomBytes(32).toString('hex');  // Generate a secure random secret key
+const iv = crypto.randomBytes(16);
+
+const encrypt = (text) => {
+    const cipher = crypto.createCipheriv(algorithm, Buffer.from(secretKey, 'hex'), iv);
+    const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
+};
+
+const decrypt = (text) => {
+    const parts = text.split(':');
+    const iv = Buffer.from(parts[0], 'hex');
+    const encryptedText = Buffer.from(parts[1], 'hex');
+    const decipher = crypto.createDecipheriv(algorithm, Buffer.from(secretKey, 'hex'), iv);
+    const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
+    return decrypted.toString();
+};
 
 // Optionally connect to MySQL if credentials are provided
 var db;
@@ -69,10 +90,10 @@ const itemsOnSale = [
   { name: 'neck', price: 450, photo: '/images/20.jpg', category: 'lamb' },
   { name: 'tail fat', price: 300, photo: '/images/21.jpg', category: 'lamb' },
   { name: 'lamb intestines', price: 300, photo: '/images/22.jpg', category: 'lamb' },
-  { name: 'دوش', price: 300, photo: '/images/23.jpg', category: 'lamb' }
+  { name: 'دوش', price: 300, photo: '/images/23.jpg', category: 'lamb' },
 ];
 
-// View engine setup
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -94,7 +115,7 @@ app.get("/sign-up", (req, res) => {
 
 app.post("/sign-up", (req, res) => {
     console.log("Received signup data:", req.body);
-    // const { firstName, secondName, email, phoneNumber, password } = req.body;
+  // const { firstName, secondName, email, phoneNumber, password } = req.body;
     // const sql = "INSERT INTO users (firstName, secondName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)";
     // db.query(sql, [firstName, secondName, email, phoneNumber, password], (err, result) => {
     //     if (err) {
@@ -108,8 +129,8 @@ app.post("/sign-up", (req, res) => {
 });
 
 app.post("/sign-in", (req, res) => {
-    console.log("Received sign-in data:", req.body);
-    // const { email, password } = req.body;
+  console.log("Received sign-in data:", req.body);
+   // const { email, password } = req.body;
     // const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
     // db.query(sql, [email, password], (err, results) => {
     //     if (err) {
@@ -123,53 +144,58 @@ app.post("/sign-in", (req, res) => {
     //     }
     // });
 
-    res.send("Sign-in data received, check console for details.");
+    const { email } = req.body; // Assuming 'email' is the username
+    const encryptedEmail = encrypt(email);
+    res.cookie('user_session', encryptedEmail, { httpOnly: true, secure: false }); // Use secure: true in production with HTTPS
+    res.send("Sign-in successful, encrypted cookie set.");
 });
 
 app.get('/items', (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const searchQuery = req.query.search || '';
-    const selectedCategory = req.query.category || '';
-    const pageSize = 9;
-    const offset = (page - 1) * pageSize;
+  const page = parseInt(req.query.page) || 1;
+  const searchQuery = req.query.search || '';
+  const selectedCategory = req.query.category || '';
+  const pageSize = 9;
+  const offset = (page - 1) * pageSize;
 
-    const filteredItems = itemsOnSale.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (selectedCategory ? item.category === selectedCategory : true)
-    );
+  const filteredItems = itemsOnSale.filter(item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (selectedCategory ? item.category === selectedCategory : true)
+  );
 
-    const paginatedItems = filteredItems.slice(offset, offset + pageSize);
-    const totalItems = filteredItems.length;
-    const totalPages = Math.ceil(totalItems / pageSize);
+  const paginatedItems = filteredItems.slice(offset, offset + pageSize);
+  const totalItems = filteredItems.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
 
-    const categories = [...new Set(itemsOnSale.map(item => item.category))];
+  const categories = [...new Set(itemsOnSale.map(item => item.category))];
 
-    res.render('items', {
-        items: paginatedItems,
-        currentPage: page,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        nextPage: page + 1,
-        prevPage: page - 1,
-        totalPages: totalPages,
-        searchQuery: searchQuery,
-        categories: categories,
-        selectedCategory: selectedCategory
-    });
+  res.render('items', {
+      items: paginatedItems,
+      currentPage: page,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+      nextPage: page + 1,
+      prevPage: page - 1,
+      totalPages: totalPages,
+      searchQuery: searchQuery,
+      categories: categories,
+      selectedCategory: selectedCategory
+  });
+    if (req.cookies.user_session) {
+        const username = decrypt(req.cookies.user_session);
+        console.log(`Decrypted username: ${username}`);
+        res.render('items', { username: username }); // Passing username to the view if needed
+    } else {
+        res.redirect("/sign-in");
+    }
 });
 
-// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
     next(createError(404));
 });
 
-// Error handler
 app.use(function(err, req, res, next) {
-    // Set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
-
-    // Render the error page
     res.status(err.status || 500);
     res.render("error");
 });
