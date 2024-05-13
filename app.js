@@ -3,11 +3,29 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+var mysql = require('mysql');
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
 var app = express();
+
+// MySQL Connection Setup
+var db = mysql.createConnection({
+    host: 'placeholder-host', // Replace with your MySQL host
+    user: 'placeholder-user', // Replace with your MySQL username
+    password: 'placeholder-password', // Replace with your MySQL password
+    database: 'placeholder-database' // Replace with your MySQL database
+});
+
+// Connect to MySQL
+db.connect((err) => {
+    if (err) {
+        console.error('Error connecting to the database: ' + err.stack);
+        return;
+    }
+    console.log('Connected to database with thread ID: ' + db.threadId);
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -16,29 +34,27 @@ app.set('view engine', 'ejs');
 const itemsOnSale = [
   { name: 'Full boned thigh', price: 370, photo: '/images/1.jpg', category: 'beef backside' },
   { name: 'Whole thigh without bone', price: 440, photo: '/images/2.jpg', category: 'beef backside' },
-  { name: 'Rose Beef ', price: 460, photo: '/images/3.jpg', category: 'beef backside' },
+  { name: 'Rose Beef', price: 460, photo: '/images/3.jpg', category: 'beef backside' },
   { name: 'Tenderloin', price: 500, photo: '/images/4.jpg', category: 'beef backside' },
-  { name: 'topside beef ', price: 450, photo: '/images/5.png ', category: 'beef backside' },
+  { name: 'topside beef', price: 450, photo: '/images/5.png', category: 'beef backside' },
   { name: 'calf', price: 450, photo: '/images/6.jpg', category: 'beef backside' },
   { name: 'Beef Topside Shank', price: 450, photo: '/images/7.jpg', category: 'beef backside' },
   { name: 'kolata', price: 450, photo: '/images/8.jpg', category: 'beef backside' },
-  { name: ' Eye of Round', price: 450, photo: '/images/9.jpg', category: 'beef backside' },
-  { name: 'backside beef ', price: 450, photo: '/images/10.jpg', category: 'beef backside' },
+  { name: 'Eye of Round', price: 450, photo: '/images/9.jpg', category: 'beef backside' },
+  { name: 'backside beef', price: 450, photo: '/images/10.jpg', category: 'beef backside' },
   { name: 'سن', price: 450, photo: '/images/11.jpg', category: 'beef Frontside' },
   { name: 'Shoulder', price: 450, photo: '/images/12.jpg', category: 'beef Frontside' },
   { name: 'Topside Shank', price: 450, photo: '/images/13.jpg', category: 'beef Frontside' },
   { name: 'Neck', price: 430, photo: '/images/14.jpg', category: 'beef Frontside' },
   { name: 'دوش', price: 350, photo: '/images/15.jpg', category: 'beef Frontside' },
   { name: 'Whole sheep', price: 450, photo: '/images/16.jpg', category: 'lamb' },
-  { name: ' whole thigh ', price: 500, photo: '/images/17.jpg', category: 'lamb' },
-  { name: ' ribs', price: 500, photo: '/images/18.jpg', category: 'lamb' },
+  { name: 'whole thigh', price: 500, photo: '/images/17.jpg', category: 'lamb' },
+  { name: 'ribs', price: 500, photo: '/images/18.jpg', category: 'lamb' },
   { name: 'Ulna meatus', price: 500, photo: '/images/19.jpg', category: 'lamb' },
   { name: 'neck', price: 450, photo: '/images/20.jpg', category: 'lamb' },
-  { name: ' tail fat', price: 300, photo: '/images/21.jpg', category: 'lamb' },
+  { name: 'tail fat', price: 300, photo: '/images/21.jpg', category: 'lamb' },
   { name: 'lamb intestines', price: 300, photo: '/images/22.jpg', category: 'lamb' },
   { name: 'دوش', price: 300, photo: '/images/23.jpg', category: 'lamb' },
-  
-  // Add more items with photos and categories here
 ];
 
 app.use(logger("dev"));
@@ -56,9 +72,37 @@ app.get("/sign-in", (req, res) => {
 app.get("/sign-up", (req, res) => {
   res.render("sign-up");
 });
-app.get("/payment", (req, res) => {
-  res.render("payment");
+
+// Signup Route
+app.post("/sign-up", (req, res) => {
+    const { firstName, secondName, email, phoneNumber, password } = req.body;
+    const sql = "INSERT INTO users (firstName, secondName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)";
+    db.query(sql, [firstName, secondName, email, phoneNumber, password], (err, result) => {
+        if (err) {
+            res.status(500).send('Error registering new user');
+            return;
+        }
+        res.redirect('/sign-in'); // Redirect to sign-in page after successful registration
+    });
 });
+
+// Sign-in Route
+app.post("/sign-in", (req, res) => {
+    const { email, password } = req.body;
+    const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+    db.query(sql, [email, password], (err, results) => {
+        if (err) {
+            res.status(500).send('Error logging in');
+            return;
+        }
+        if (results.length > 0) {
+            res.redirect('/items'); // Redirect to items page on successful login
+        } else {
+            res.send('Email or password is incorrect');
+        }
+    });
+});
+
 app.get('/items', (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const searchQuery = req.query.search || '';
@@ -91,23 +135,24 @@ app.get('/items', (req, res) => {
   });
 });
 
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
+// Catch 404 and forward to error handler
+app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
+// Error handler
+app.use(function(err, req, res, next) {
+  // Set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error page
+  // Render the error page
   res.status(err.status || 500);
   res.render("error");
 });
+
 app.listen(3006, function() {
-  console.log('App is running on port 3000');
+  console.log('App is running on port 3006');
 });
+
 module.exports = app;
