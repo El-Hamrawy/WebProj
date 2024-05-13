@@ -10,22 +10,26 @@ var usersRouter = require("./routes/users");
 
 var app = express();
 
-// MySQL Connection Setup
-var db = mysql.createConnection({
-    host: '192.168.50.92', // Replace with your MySQL host
-    user: 'warraky', // Replace with your MySQL username
-    password: 'root', // Replace with your MySQL password
-    database: 'butcher' // Replace with your MySQL database
-});
+// Optionally connect to MySQL if credentials are provided
+var db;
+if (process.env.DB_HOST && process.env.DB_USER && process.env.DB_PASS && process.env.DB_NAME) {
+    db = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_NAME
+    });
 
-// Connect to MySQL
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database: ' + err.stack);
-        return;
-    }
-    console.log('Connected to database with thread ID: ' + db.threadId);
-});
+    db.connect((err) => {
+        if (err) {
+            console.error('Error connecting to the database: ' + err.stack);
+            return;
+        }
+        console.log('Connected to database with thread ID: ' + db.threadId);
+    });
+} else {
+    console.log('Database credentials not provided. Skipping DB connection.');
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -65,12 +69,16 @@ const itemsOnSale = [
   { name: 'neck', price: 450, photo: '/images/20.jpg', category: 'lamb' },
   { name: 'tail fat', price: 300, photo: '/images/21.jpg', category: 'lamb' },
   { name: 'lamb intestines', price: 300, photo: '/images/22.jpg', category: 'lamb' },
-  { name: 'دوش', price: 300, photo: '/images/23.jpg', category: 'lamb' },
+  { name: 'دوش', price: 300, photo: '/images/23.jpg', category: 'lamb' }
 ];
+
+// View engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 app.use(logger("dev"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -78,92 +86,96 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
 app.get("/sign-in", (req, res) => {
-  res.render("sign-in");
+    res.render("sign-in");
 });
 app.get("/sign-up", (req, res) => {
-  res.render("sign-up");
+    res.render("sign-up");
 });
 
-// Signup Route
 app.post("/sign-up", (req, res) => {
-    const { firstName, secondName, email, phoneNumber, password } = req.body;
-    const sql = "INSERT INTO users (firstName, secondName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)";
-    db.query(sql, [firstName, secondName, email, phoneNumber, password], (err, result) => {
-        if (err) {
-            res.status(500).send('Error registering new user');
-            return;
-        }
-        res.redirect('/sign-in'); // Redirect to sign-in page after successful registration
-    });
+    console.log("Received signup data:", req.body);
+    // const { firstName, secondName, email, phoneNumber, password } = req.body;
+    // const sql = "INSERT INTO users (firstName, secondName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)";
+    // db.query(sql, [firstName, secondName, email, phoneNumber, password], (err, result) => {
+    //     if (err) {
+    //         res.status(500).send('Error registering new user');
+    //         return;
+    //     }
+    //     res.redirect('/sign-in'); // Redirect to sign-in page after successful registration
+    // });
+
+    res.send("Signup data received, check console for details.");
 });
 
-// Sign-in Route
 app.post("/sign-in", (req, res) => {
-    const { email, password } = req.body;
-    const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-    db.query(sql, [email, password], (err, results) => {
-        if (err) {
-            res.status(500).send('Error logging in');
-            return;
-        }
-        if (results.length > 0) {
-            res.redirect('/items'); // Redirect to items page on successful login
-        } else {
-            res.send('Email or password is incorrect');
-        }
-    });
+    console.log("Received sign-in data:", req.body);
+    // const { email, password } = req.body;
+    // const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+    // db.query(sql, [email, password], (err, results) => {
+    //     if (err) {
+    //         res.status(500).send('Error logging in');
+    //         return;
+    //     }
+    //     if (results.length > 0) {
+    //         res.redirect('/items'); // Redirect to items page on successful login
+    //     } else {
+    //         res.send('Email or password is incorrect');
+    //     }
+    // });
+
+    res.send("Sign-in data received, check console for details.");
 });
 
 app.get('/items', (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const searchQuery = req.query.search || '';
-  const selectedCategory = req.query.category || '';
-  const pageSize = 9;
-  const offset = (page - 1) * pageSize;
+    const page = parseInt(req.query.page) || 1;
+    const searchQuery = req.query.search || '';
+    const selectedCategory = req.query.category || '';
+    const pageSize = 9;
+    const offset = (page - 1) * pageSize;
 
-  const filteredItems = itemsOnSale.filter(item =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (selectedCategory ? item.category === selectedCategory : true)
-  );
+    const filteredItems = itemsOnSale.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedCategory ? item.category === selectedCategory : true)
+    );
 
-  const paginatedItems = filteredItems.slice(offset, offset + pageSize);
-  const totalItems = filteredItems.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
+    const paginatedItems = filteredItems.slice(offset, offset + pageSize);
+    const totalItems = filteredItems.length;
+    const totalPages = Math.ceil(totalItems / pageSize);
 
-  const categories = [...new Set(itemsOnSale.map(item => item.category))];
+    const categories = [...new Set(itemsOnSale.map(item => item.category))];
 
-  res.render('items', {
-      items: paginatedItems,
-      currentPage: page,
-      hasNextPage: page < totalPages,
-      hasPrevPage: page > 1,
-      nextPage: page + 1,
-      prevPage: page - 1,
-      totalPages: totalPages,
-      searchQuery: searchQuery,
-      categories: categories,
-      selectedCategory: selectedCategory
-  });
+    res.render('items', {
+        items: paginatedItems,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        nextPage: page + 1,
+        prevPage: page - 1,
+        totalPages: totalPages,
+        searchQuery: searchQuery,
+        categories: categories,
+        selectedCategory: selectedCategory
+    });
 });
 
 // Catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 // Error handler
 app.use(function(err, req, res, next) {
-  // Set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+    // Set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // Render the error page
-  res.status(err.status || 500);
-  res.render("error");
+    // Render the error page
+    res.status(err.status || 500);
+    res.render("error");
 });
 
 app.listen(3006, function() {
-  console.log('App is running on port 3006');
+    console.log('App is running on port 3006');
 });
 
 module.exports = app;
